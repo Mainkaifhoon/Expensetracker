@@ -1,16 +1,39 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { Hash } from "lucide-react";
 
 const App = () => {
   const [input, setInput] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
   const [expense, setExpense] = useState([]);
+  const [filter, setFilter] = useState([]);
   
-  const totalAmount= expense.reduce((sum,item)=>{
-    return sum+ Number(item.amount)
-  },0)
+  const filteredExpenses = filter.length===0 ? expense : expense.filter((item)=>{
 
-  function handleRender(e) {
+    return filter.includes(item.category)
+    
+  })
+  
+  const totalAmount = filteredExpenses.reduce((sum, item) => {
+    return sum + Number(item.amount);
+  }, 0);
+
+
+  function handleFilter(checked, value) {
+    const newFilter = {
+      isChecked: checked,
+      value: value,
+    };
+    if (newFilter.isChecked) {
+      setFilter((prev) => [...prev, newFilter.value]);
+    } else {
+      setFilter((prev) => prev.filter((item) => item !== newFilter.value));
+    }
+
+    console.log(filter);
+  }
+
+  function handleRender() {
     if (input == "" || amount == "" || category == "") {
       alert("Fill all the fields");
     } else {
@@ -20,6 +43,7 @@ const App = () => {
         category: category,
       };
       setExpense((prev) => [...prev, newExpense]);
+      console.log(expense)
       setInput("");
       setAmount("");
       setCategory("");
@@ -28,7 +52,6 @@ const App = () => {
 
   function handleDelete(idx) {
     const copyExpense = [...expense];
-    console.log(copyExpense);
     copyExpense.splice(idx, 1);
     setExpense(copyExpense);
   }
@@ -47,18 +70,23 @@ const App = () => {
       <header>
         {/* Title section */}
         <div className="flex flex-col items-center py-6 bg-gray-800 text-white">
-          <h1 className="text-3xl mb-2  ">Expense Tracker</h1>
+          <h1 className="text-3xl mb-2">Expense Tracker</h1>
           <p className="text-sm">Track your expense </p>
         </div>
 
         {/* Input Column */}
         <nav className="bg-white rounded-xl shadow-md p-6 m-4">
-          <h2 className="text-xl mb-2 p-2">Add New Expense</h2>
+          <h2 className="text-2xl mb-2 p-2 font-semibold">Add New Expense</h2>
           <div className="flex gap-6 items-end flex-wrap">
             <div className="flex flex-col gap-1 ">
               {/* Input Section */}
               <label htmlFor="title">Title</label>
               <input
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleRender();
+                  }
+                }}
                 value={input}
                 onChange={(e) => {
                   setInput(e.target.value);
@@ -71,6 +99,11 @@ const App = () => {
             <div className="flex flex-col gap-1 items-start">
               <label htmlFor="title">Amount(R)</label>
               <input
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleRender();
+                  }
+                }}
                 min={0}
                 max={100000}
                 value={amount}
@@ -83,8 +116,13 @@ const App = () => {
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label htmlFor="">Category</label>
+              <label htmlFor="Category">Category</label>
               <select
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleRender();
+                  }
+                }}
                 value={category}
                 onChange={(e) => {
                   setCategory(e.target.value);
@@ -96,7 +134,8 @@ const App = () => {
                 <option value="" disabled className="text-gray-600">
                   Select Category
                 </option>
-                <option value="Food">Food</option>
+
+                <option value="Food"> Food</option>
                 <option value="Shopping">Shopping</option>
                 <option value="Entertainment">Entertainment</option>
                 <option value="Education">Education</option>
@@ -109,19 +148,19 @@ const App = () => {
               onClick={(e) => {
                 handleRender(e);
               }}
-              className=" hover:cursor-pointer active:scale-95 hover:bg-green-600 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+              className=" hover:cursor-pointer active:scale-95 hover:bg-green-[600] bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
             >
               + Add
             </button>
           </div>
         </nav>
       </header>
-      <main className="flex gap-6 p-6 flex-1 overflow-hidden">
-        <div className="flex-1 bg-white rounded-xl shadow-md p-4 overflow-y-auto h-full no-scrollbar">
+      <main className="flex gap-6 p-6 h-screen overflow-hidden">
+        <div className="flex-4/3 bg-white rounded-xl shadow-md p-4 overflow-y-auto h-full no-scrollbar">
           {" "}
-          <h1 className="text-xl font-semibold mb-3">Expenses</h1>{" "}
+          <h1 className="text-2xl  font-semibold  mb-3">Expenses</h1>{" "}
           {/* Redering Section */}
-          {expense.map((e, idx) => {
+          {filteredExpenses.map((e, idx) => {
             return (
               <div
                 key={idx}
@@ -147,8 +186,83 @@ const App = () => {
             );
           })}
         </div>
-        <div className="flex-1 bg-white rounded-xl shadow-md p-4 overflow-y-auto">
-          <h1 className="text-2xl">Total amount: {totalAmount}</h1>
+        <div className="flex  flex-col gap-6">
+          {/* Total Amount Section */}
+          <div className="bg-white rounded-xl shadow-md p-4">
+            <h1 className="text-2xl font-semibold">
+              Total amount : {totalAmount}
+            </h1>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-md p-4  ">
+            {" "}
+            {/* Filter Section  */}
+            <p className=" text-2xl font-semibold p-1">Filters</p>
+            <div className="flex gap-2 flex-wrap justify-start mt-3 items-center text-xl">
+              <div className="flex items-center gap-2">
+                <input
+                  onChange={(e) => {
+                    handleFilter(e.target.checked, e.target.value);
+                  }}
+                  value="Food"
+                  id="food"
+                  type="checkbox"
+                />
+                <label htmlFor="food">Food</label>
+              </div>
+
+              <div className="flex items-center gap-2 ">
+                <input
+                  onChange={(e) => {
+                    handleFilter(e.target.checked, e.target.value);
+                  }}
+                  value="Shopping"
+                  id="shopping"
+                  type="checkbox"
+                />
+                <label htmlFor="shopping">Shopping</label>
+              </div>
+
+              <input
+                onChange={(e) => {
+                  handleFilter(e.target.checked, e.target.value);
+                }}
+                value="Entertainment"
+                id="entertainment"
+                type="checkbox"
+              />
+              <label htmlFor="entertainment">Entertainment</label>
+
+              <input
+                onChange={(e) => {
+                  handleFilter(e.target.checked, e.target.value);
+                }}
+                value="Education"
+                id="education"
+                type="checkbox"
+              />
+              <label htmlFor="education">Education</label>
+
+              <input
+                onChange={(e) => {
+                  handleFilter(e.target.checked, e.target.value);
+                }}
+                value="Travel"
+                id="travel"
+                type="checkbox"
+              />
+              <label htmlFor="travel">Travel</label>
+              <input
+                onChange={(e) => {
+                  handleFilter(e.target.checked, e.target.value);
+                }}
+                value="Miscellaneous"
+                id="misc"
+                type="checkbox"
+              />
+              <label htmlFor="misc">Miscellaneous</label>
+            </div>
+          </div>
         </div>
       </main>
     </div>
