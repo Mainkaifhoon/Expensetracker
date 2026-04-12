@@ -198,7 +198,7 @@ const App = () => {
             {" "}
             {/* Filter Section  */}
             <p className=" text-2xl font-semibold p-1">Filters</p>
-            <div className="flex gap-2 flex-wrap justify-start mt-3 items-center text-xl">
+            <div className="flex gap-4 flex-wrap justify-start mt-3 items-center text-xl">
               <div className="flex items-center gap-2">
                 <input
                   onChange={(e) => {
