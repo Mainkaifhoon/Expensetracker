@@ -145,7 +145,7 @@ const App = () => {
                 }}
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="border rounded-md px-3 py-2 w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="hover:cursor-pointer border rounded-md px-3 py-2 w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               >
                 <option value="" disabled>
                   Select Category
@@ -162,7 +162,7 @@ const App = () => {
             <div className="flex items-center justify-center mt-3">
               <button
                 onClick={(e) => handleRender(e)}
-                className="w-full bg-green-500 dark:bg-green-600 text-white px-3 py-2 rounded-xl hover:bg-green-600 dark:hover:bg-green-700 active:scale-95 m-3"
+                className="hover:cursor-pointer w-full bg-green-500 dark:bg-green-600 text-white px-3 py-2 rounded-xl hover:bg-green-600 dark:hover:bg-green-700 active:scale-95 m-3"
               >
                 + Add
               </button>
@@ -196,7 +196,7 @@ const App = () => {
                   <p className="font-bold">₹{e.amount}</p>
                   <button
                     onClick={() => handleDelete(idx)}
-                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 active:scale-95"
+                    className="hover:cursor-pointer bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 active:scale-95"
                   >
                     Delete
                   </button>
