@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Sun, Moon } from "lucide-react";
+
 const App = () => {
   const [input, setInput] = useState("");
   const [amount, setAmount] = useState("");
@@ -7,7 +8,21 @@ const App = () => {
   const [expense, setExpense] = useState([]);
   const [filter, setFilter] = useState([]);
   const [dark, setDark] = useState(false);
+  const isFirstRender= useRef(true);
+ 
+  useEffect(() => {
+    if (expense.length === 0) return;
+    localStorage.setItem("expenses", JSON.stringify(expense));
+  }, [expense]);
 
+
+ useEffect(() => {
+    const savedExpense = localStorage.getItem("expenses");
+    if (savedExpense) {
+      setExpense(JSON.parse(savedExpense));
+    }
+  }, []);
+  
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
 
