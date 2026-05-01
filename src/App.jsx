@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Sun, Moon } from "lucide-react";
+import ExpenseList from "./components/ExpenseList";
+import ExpenseForm from "./components/ExpenseForm";
 
 const App = () => {
   const [input, setInput] = useState("");
@@ -8,21 +10,19 @@ const App = () => {
   const [expense, setExpense] = useState([]);
   const [filter, setFilter] = useState([]);
   const [dark, setDark] = useState(false);
-  const isFirstRender= useRef(true);
- 
+
   useEffect(() => {
     if (expense.length === 0) return;
     localStorage.setItem("expenses", JSON.stringify(expense));
   }, [expense]);
 
-
- useEffect(() => {
+  useEffect(() => {
     const savedExpense = localStorage.getItem("expenses");
     if (savedExpense) {
       setExpense(JSON.parse(savedExpense));
     }
   }, []);
-  
+
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
 
@@ -108,7 +108,7 @@ const App = () => {
           <div>
             <button
               onClick={handleDarkMode}
-              className="bg-gray-700 hover:cursor-pointer dark:bg-gray-600 hover:bg-gray-600 dark:hover:bg-gray-500 p-2 rounded-full active:scale-95 transition"
+              className="bg-gray-900 hover:cursor-pointer dark:bg-gray-600 hover:bg-gray-600 dark:hover:bg-gray-500 p-2 rounded-full active:scale-95 transition"
             >
               {dark ? <Sun size={20} /> : <Moon size={20} />}
             </button>
@@ -116,110 +116,21 @@ const App = () => {
         </div>
 
         {/* INPUT SECTION */}
-        <nav className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 sm:p-6 m-4 max-w-[85rem] w-full mx-auto">
-          <h2 className="text-xl sm:text-2xl mb-4 font-semibold">
-            Add New Expense
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="flex flex-col gap-1">
-              <label>Title</label>
-              <input
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleRender();
-                }}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                className="border rounded-md px-3 py-2 w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                placeholder="e.g. Lunch, Groceries"
-                type="text"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label>Amount (₹)</label>
-              <input
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleRender();
-                }}
-                min={0}
-                max={100000}
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="border rounded-md px-3 py-2 w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                placeholder="e.g. 250"
-                type="number"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label>Category</label>
-              <select
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleRender();
-                }}
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="hover:cursor-pointer border rounded-md px-3 py-2 w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              >
-                <option value="" disabled>
-                  Select Category
-                </option>
-                <option value="Food">Food</option>
-                <option value="Shopping">Shopping</option>
-                <option value="Entertainment">Entertainment</option>
-                <option value="Education">Education</option>
-                <option value="Travel">Travel</option>
-                <option value="Miscellaneous">Miscellaneous</option>
-              </select>
-            </div>
-
-            <div className="flex items-center justify-center mt-3">
-              <button
-                onClick={(e) => handleRender(e)}
-                className="hover:cursor-pointer w-full bg-green-500 dark:bg-green-600 text-white px-3 py-2 rounded-xl hover:bg-green-600 dark:hover:bg-green-700 active:scale-95 m-3"
-              >
-                + Add
-              </button>
-            </div>
-          </div>
-        </nav>
+        <ExpenseForm
+          input={input}
+          setInput={setInput}
+          amount={amount}
+          setAmount={setAmount}
+          category={category}
+          setCategory={setCategory}
+          handleRender={handleRender}
+        />
       </header>
 
       {/* MAIN */}
       <main className="flex flex-col lg:flex-row gap-4 p-4 max-w-[85rem] mx-auto w-full">
         {/* EXPENSE LIST */}
-        <div className="flex-[2] bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 max-h-[600px] overflow-y-auto">
-          <h1 className="text-xl sm:text-2xl font-semibold mb-3">Expenses</h1>
-
-          {filteredExpenses.length === 0 ? (
-            <p className="text-gray-500 dark:text-gray-400">No expenses yet</p>
-          ) : (
-            filteredExpenses.map((e, idx) => (
-              <div
-                key={idx}
-                className="flex justify-between items-center border-b border-gray-200 dark:border-gray-600 py-2"
-              >
-                <div>
-                  <h2 className="font-semibold">{e.input}</h2>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {e.category}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <p className="font-bold">₹{e.amount}</p>
-                  <button
-                    onClick={() => handleDelete(idx)}
-                    className="hover:cursor-pointer bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 active:scale-95"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+        <ExpenseList expenses={filteredExpenses} handleDelete={handleDelete} />
 
         {/* SIDEBAR */}
         <div className="flex-[1] w-full lg:w-80 flex flex-col gap-4">
