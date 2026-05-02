@@ -74,90 +74,139 @@ const App = () => {
     }
   }
 
-async function handleRender() {
-  if (input === "" || amount === "") {
-    alert("Fill required fields");
-    return;
-  }
-
-  // 🔥 1. instant fallback (fast UI)
-  let finalCategory = category || autoCategorize(input);
-
-  const newExpense = {
-    input,
-    amount,
-category: finalCategory
-  };
-
-  setExpense((prev) => [...prev, newExpense]);
-
-  // 🔥 2. AI runs in background
-  if (!category) {
-    try {
-      console.log("AI USED");
-
-const res = await fetch("https://expense-tracker-backend-igx5.onrender.com/categorize", {        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text: input }),
-      });
-
-      const data = await res.json();
-
-      setExpense((prev) => {
-        const copy = [...prev];
-
-        copy[copy.length - 1].category =
-          data.category === "Miscellaneous"
-            ? autoCategorize(input)
-            : data.category;
-
-        return copy;
-      });
-
-    } catch (err) {
-      console.log("FALLBACK USED");
+  async function handleRender() {
+    if (input === "" || amount === "") {
+      alert("Fill required fields");
+      return;
     }
+
+    // 🔥 1. instant fallback (fast UI)
+    let finalCategory = category || autoCategorize(input);
+
+    const newExpense = {
+      input,
+      amount,
+      category: finalCategory,
+    };
+
+    setExpense((prev) => [...prev, newExpense]);
+
+    // 🔥 2. AI runs in background
+    if (!category) {
+      try {
+        console.log("AI USED");
+
+        const res = await fetch(
+          "https://expense-tracker-backend-igx5.onrender.com/categorize",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ text: input }),
+          },
+        );
+
+        const data = await res.json();
+
+        setExpense((prev) => {
+          const copy = [...prev];
+
+          copy[copy.length - 1].category =
+            data.category === "Miscellaneous"
+              ? autoCategorize(input)
+              : data.category;
+
+          return copy;
+        });
+      } catch (err) {
+        console.log("FALLBACK USED");
+      }
+    }
+
+    setInput("");
+    setAmount("");
+    setCategory("");
   }
 
-  setInput("");
-  setAmount("");
-  setCategory("");
-}
+  function autoCategorize(title) {
+    const text = title.toLowerCase();
 
-function autoCategorize(title) {
-  const text = title.toLowerCase(); 
+    const foodKeywords = [
+      "pizza",
+      "burger",
+      "pasta",
+      "biryani",
+      "kebab",
+      "chips",
+      "snack",
+      "lunch",
+      "dinner",
+      "breakfast",
+      "meal",
+      "restaurant",
+      "cafe",
+      "coffee",
+      "tea",
+    ];
 
-  const foodKeywords = [
-    "pizza","burger","pasta","biryani","kebab","chips","snack",
-    "lunch","dinner","breakfast","meal","restaurant","cafe","coffee","tea"
-  ];
+    const travelKeywords = [
+      "uber",
+      "ola",
+      "bus",
+      "train",
+      "metro",
+      "flight",
+      "taxi",
+      "petrol",
+      "diesel",
+      "fuel",
+    ];
 
-  const travelKeywords = [
-    "uber","ola","bus","train","metro","flight","taxi","petrol","diesel","fuel"
-  ];
+    const entertainmentKeywords = [
+      "movie",
+      "netflix",
+      "prime",
+      "hotstar",
+      "game",
+      "concert",
+      "music",
+      "spotify",
+    ];
 
-  const entertainmentKeywords = [
-    "movie","netflix","prime","hotstar","game","concert","music","spotify"
-  ];
+    const educationKeywords = [
+      "book",
+      "course",
+      "fees",
+      "school",
+      "college",
+      "tuition",
+      "exam",
+      "class",
+    ];
 
-  const educationKeywords = [
-    "book","course","fees","school","college","tuition","exam","class"
-  ];
+    const shoppingKeywords = [
+      "shirt",
+      "jeans",
+      "clothes",
+      "shoes",
+      "amazon",
+      "flipkart",
+      "order",
+      "shopping",
+      "bag",
+    ];
 
-  const shoppingKeywords = [
-    "shirt","jeans","clothes","shoes","amazon","flipkart","order","shopping","bag"
-  ];
+    if (foodKeywords.some((word) => text.includes(word))) return "Food";
+    if (travelKeywords.some((word) => text.includes(word))) return "Travel";
+    if (entertainmentKeywords.some((word) => text.includes(word)))
+      return "Entertainment";
+    if (educationKeywords.some((word) => text.includes(word)))
+      return "Education";
+    if (shoppingKeywords.some((word) => text.includes(word))) return "Shopping";
 
-  if (foodKeywords.some(word => text.includes(word))) return "Food";
-  if (travelKeywords.some(word => text.includes(word))) return "Travel";
-  if (entertainmentKeywords.some(word => text.includes(word))) return "Entertainment";
-  if (educationKeywords.some(word => text.includes(word))) return "Education";
-  if (shoppingKeywords.some(word => text.includes(word))) return "Shopping";
-
-  return "Miscellaneous";
-}
+    return "Miscellaneous";
+  }
 
   function handleDelete(idx) {
     const copyExpense = [...expense];
