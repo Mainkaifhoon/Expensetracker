@@ -96,8 +96,7 @@ category: finalCategory
     try {
       console.log("AI USED");
 
-      const res = await fetch("http://localhost:5000/categorize", {
-        method: "POST",
+const res = await fetch("https://expense-tracker-backend-igx5.onrender.com/categorize", {        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
