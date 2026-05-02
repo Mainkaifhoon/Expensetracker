@@ -20,29 +20,45 @@ app.post("/categorize", async (req, res) => {
 
     const response = await client.chat.completions.create({
       model: "openai/gpt-3.5-turbo",
-     messages: [
-  {
-    role: "system",
-    content: `
+      temperature: 0,
+      messages: [
+        {
+          role: "system",
+          content: `
 You are an expense categorization system.
 
-Return ONLY one of:
+Return ONLY one category from:
 Food, Shopping, Travel, Entertainment, Education, Miscellaneous.
 
-Rules:
-- Food includes: pizza, pasta, biryani, kebab, chips, snacks, lunch, dinner, breakfast, groceries, restaurant, cafe, meal.
-- Travel includes: uber, ola, bus, train, flight, taxi.
-- Entertainment: movie, netflix, games.
-- Education: books, course, fees.
-- Shopping: clothes, amazon, electronics.
+STRICT RULES:
 
-If unsure, pick the closest category (DO NOT default to Miscellaneous).
+Food:
+pizza, pasta, biryani, sushi, noodles, burger, fries, chips, snacks, groceries, milk, curd, beans, meal, lunch, dinner, breakfast, restaurant, cafe
 
-Output exactly one word from the list.
-`,
-  },
-  { role: "user", content: text },
-]
+Shopping:
+clothes, jeans, shoes, amazon, flipkart, electronics, gadgets
+
+Travel:
+uber, ola, taxi, bus, train, flight, fuel, petrol
+
+Entertainment:
+movie, netflix, games, subscriptions
+
+Education:
+books, course, fees, tuition
+
+IMPORTANT:
+- ALWAYS match keywords strongly
+- NEVER randomly choose category
+- DO NOT return explanations
+- DO NOT return multiple words
+- If unsure → choose closest match (not Miscellaneous unless truly unknown)
+
+Return only one word.
+          `,
+        },
+        { role: "user", content: text },
+      ],
     });
 
     const category = response.choices[0].message.content.trim();
