@@ -1,3 +1,4 @@
+console.log("NEW BUILD v2");
 import { useEffect, useRef, useState } from "react";
 import { Sun, Moon } from "lucide-react";
 import ExpenseList from "./components/ExpenseList";
